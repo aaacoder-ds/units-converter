@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+CODE_OF_CONDUCT.md
+
+# Development files
+.github
+commitlint.config.js
+package.json
+package-lock.json
+
+# Images and assets not needed
+*.svg
+*.png
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  units-converter:
+    image: ghcr.io/aaacoder-ds/units-converter:main
+    container_name: units-converter
+    restart: unless-stopped
+    ports:
+      - "3000:80"
