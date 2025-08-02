@@ -8,7 +8,7 @@ WORKDIR /usr/share/nginx/html
 RUN rm -rf ./*
 
 # Copy the Unit Converter directory contents to nginx html directory
-COPY "Unit Converter/" "./"
+COPY Unit\ Converter/ ./
 
 # Copy nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
