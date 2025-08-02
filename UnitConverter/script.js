@@ -1,153 +1,227 @@
-//Javascript for index.html will be written here
-//Javascript for index.html will be written here
+// Modern Unit Converter JavaScript
 
-let links = document.getElementsByClassName("link");
-let hamLinks = document.getElementsByClassName("hamlink");
-let moon = document.querySelector(".fa-moon");
-let footer = document.querySelector("footer");
-let mainContent = document.querySelector(".main-content");
-let bars = document.querySelector(".fa-bars");
-let hamBurger = document.getElementById("hamburger");
-console.log(links[0]);
+// DOM Elements
+const sidebar = document.querySelector('.sidebar');
+const menuButton = document.querySelector('.menu-button');
+const closeSidebarButton = document.querySelector('.close-sidebar');
 
-function hoverInWhiteMode() {
-  links[0].style.backgroundColor = "gray";
-  links[0].style.color = "black";
-  for (let i = 1; i < links.length; i++) {
-    links[i].addEventListener("mouseenter", (e) => {
-      links[0].style.backgroundColor = "#E5DBCC";
-      links[0].style.color = "black";
-      e.target.style.backgroundColor = "gray";
-    });
-
-    links[i].addEventListener("mouseleave", (e) => {
-      links[0].style.backgroundColor = "gray";
-      e.target.style.backgroundColor = "#E5DBCC";
-      e.target.style.color = "black";
-    });
-  }
+// Sidebar functionality
+function showSidebar() {
+  sidebar.classList.add('active');
+  document.body.style.overflow = 'hidden'; // Prevent background scrolling
 }
 
-function hoverInDarkMode() {
-  links[0].style.backgroundColor = "#ffffff";
-  links[0].style.color = "black";
-  for (let i = 1; i < links.length; i++) {
-    links[i].addEventListener("mouseenter", (e) => {
-      links[0].style.backgroundColor = "black";
-      links[0].style.color = "#ffffff";
-      e.target.style.backgroundColor = "#ffffff";
-      e.target.style.color = "black";
-    });
-
-    links[i].addEventListener("mouseleave", (e) => {
-      links[0].style.backgroundColor = "#ffffff";
-      links[0].style.color = "black";
-      e.target.style.backgroundColor = "black";
-      e.target.style.color = "#ffffff";
-    });
-  }
+function hideSidebar() {
+  sidebar.classList.remove('active');
+  document.body.style.overflow = ''; // Restore scrolling
 }
 
-hoverInWhiteMode();
+// Close sidebar when clicking outside
+document.addEventListener('click', (e) => {
+  if (sidebar.classList.contains('active') && 
+      !sidebar.contains(e.target) && 
+      !menuButton.contains(e.target)) {
+    hideSidebar();
+  }
+});
 
-let click = 1;
+// Close sidebar with Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+    hideSidebar();
+  }
+});
 
-moon.addEventListener("click", (e) => {
-  console.log("Abhay");
-
-  if (click === 1) {
-    click = 0;
+// Add active state to current page in navigation
+function setActiveNavItem() {
+  const currentPath = window.location.pathname;
+  const navLinks = document.querySelectorAll('nav a, .sidebar a');
   
-    for (let i = 0; i < links.length; i++) {
-      links[i].style.color = "#ffffff";
-      links[i].style.backgroundColor = "black";
+  navLinks.forEach(link => {
+    if (link.getAttribute('href') && currentPath.includes(link.getAttribute('href'))) {
+      link.classList.add('active');
     }
-    hoverInDarkMode();
-    mainContent.style.backgroundColor = "#798d7a";
-    moon.style.color = "#ffffff";
-    bars.style.color = "#ffffff";
-    footer.style.color = "#ffffff";
-    footer.style.backgroundColor = "black";
-  } else {
-    for (let i = 0; i < links.length; i++) {
-      links[i].style.backgroundColor = "#E5DBCC";
-      links[i].style.color = "black";
+  });
+}
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function (e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
     }
-    hoverInWhiteMode();
-   
+  });
+});
+
+// Add loading animation to converter cards
+function animateCards() {
+  const cards = document.querySelectorAll('.converter-card');
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, {
+    threshold: 0.1
+  });
+  
+  cards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+    card.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+    observer.observe(card);
+  });
+}
+
+// Add hover effects to converter cards
+function addCardHoverEffects() {
+  const cards = document.querySelectorAll('.converter-card');
+  
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'translateY(-8px) scale(1.02)';
+    });
     
-    moon.style.color = "black";
-    bars.style.color = "black";
-    mainContent.style.backgroundColor = "#867285";
-    footer.style.color = "gray";
-    footer.style.backgroundColor = "#ffffff";
-    click = 1;
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'translateY(0) scale(1)';
+    });
+  });
+}
+
+// Add keyboard navigation support
+function addKeyboardNavigation() {
+  const cards = document.querySelectorAll('.converter-card');
+  
+  cards.forEach(card => {
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', card.querySelector('h3').textContent);
+    
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  });
+}
+
+// Add copy to clipboard functionality for results (if on converter pages)
+function addCopyToClipboard() {
+  const resultInputs = document.querySelectorAll('input[readonly]');
+  
+  resultInputs.forEach(input => {
+    input.addEventListener('click', () => {
+      input.select();
+      document.execCommand('copy');
+      
+      // Show feedback
+      const originalValue = input.value;
+      input.value = 'Copied!';
+      input.style.color = '#10b981';
+      
+      setTimeout(() => {
+        input.value = originalValue;
+        input.style.color = '';
+      }, 1000);
+    });
+  });
+}
+
+// Add form validation and real-time conversion
+function addFormValidation() {
+  const forms = document.querySelectorAll('form');
+  
+  forms.forEach(form => {
+    const inputs = form.querySelectorAll('input[type="number"]');
+    const selects = form.querySelectorAll('select');
+    
+    inputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+        if (isNaN(value) && e.target.value !== '') {
+          e.target.style.borderColor = '#ef4444';
+        } else {
+          e.target.style.borderColor = '';
+        }
+      });
+    });
+    
+    selects.forEach(select => {
+      select.addEventListener('change', () => {
+        select.style.borderColor = '';
+      });
+    });
+  });
+}
+
+// Add responsive image loading
+function addResponsiveImages() {
+  const images = document.querySelectorAll('img');
+  
+  images.forEach(img => {
+    img.addEventListener('load', () => {
+      img.style.opacity = '1';
+    });
+    
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.3s ease-in-out';
+  });
+}
+
+// Initialize all functionality
+function init() {
+  setActiveNavItem();
+  animateCards();
+  addCardHoverEffects();
+  addKeyboardNavigation();
+  addCopyToClipboard();
+  addFormValidation();
+  addResponsiveImages();
+  
+  // Add smooth scrolling to the page
+  document.documentElement.style.scrollBehavior = 'smooth';
+}
+
+// Run initialization when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+// Add service worker for offline functionality
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('Service Worker registered successfully:', registration);
+      })
+      .catch(registrationError => {
+        console.log('Service Worker registration failed:', registrationError);
+      });
+  });
+}
+
+// Add performance monitoring
+window.addEventListener('load', () => {
+  if ('performance' in window) {
+    const perfData = performance.getEntriesByType('navigation')[0];
+    console.log('Page load time:', perfData.loadEventEnd - perfData.loadEventStart, 'ms');
   }
 });
 
-bars.addEventListener("click", (e) => {
-  // console.log("Abhay");
-  if (click === 1) {
-    bars.classList.remove("fa-bars");
-    bars.classList.add("fa-xmark");
-    bars.classList.add("fa-2.5x");
-    bars.style.marginRight = "10px";
-    // hamBurger.style.display = "block"
-    hamBurger.style.height = "50vh";
-    for(let i = 0; i < hamLinks.length; i++)
-    {
-      hamLinks[i].style.display = "block";
-      hamLinks[i].style.height = "50vh";
-      hamLinks[i].style.transition = "height 10s ease-in-out";
-      hamLinks[i].style.display = "flex";
-      hamLinks[i].style.justifyContent = "center";
-      hamLinks[i].style.alignItems = "center";
-      hamLinks[i].style.color = "black";
-      hamLinks[i].style.textDecoration = "none";
-      hamLinks[i].style.fontWeight = "500";
-    }
-
-    hamLinks[0].style.opacity = "1";
-    hamLinks[0].style.transition = "opacity 0.08333s easeInOut";
-
-    hamLinks[1].style.opacity = "1";
-    hamLinks[1].style.transition = "opacity 0.16666s easeInOut";
-
-    hamLinks[2].style.opacity = "1";
-    hamLinks[2].style.transition = "opacity 0.25s easeInOut";
-
-    hamLinks[3].style.opacity = "1";
-    hamLinks[3].style.transition = "opacity 0.33333s easeInOut";
-
-    hamLinks[4].style.opacity = "1";
-    hamLinks[4].style.transition = "opacity 0.41666s easeInOut";
-
-    hamLinks[5].style.opacity = "1";
-    hamLinks[5].style.transition = "opacity 0.5s easeInOut";
-    click = 0;
-  } else {
-    bars.classList.remove("fa-xmark");
-    bars.classList.add("fa-bars");
-    bars.style.zIndex = 10;
-    hamBurger.style.height = 0;
-    for(let i = 0; i < hamLinks.length; i++)
-    {
-      hamLinks[i].style.display = "none";
-      hamLinks[i].style.height = "0vh";
-      hamLinks[i].style.transition = "height 0.5s easeInOut";
-    }
-
-    hamLinks[0].style.opacity = "0";
-    hamLinks[0].style.transition = "opacity 0.08333s easeInOut";
-    click = 1;
-  }
-});
-
-function showSidebar(){
-  const sidebar = document.querySelector('.sidebar')
-  sidebar.style.display = 'flex'
-}
-function hideSidebar(){
-  const sidebar = document.querySelector('.sidebar')
-  sidebar.style.display = 'none'
-}
+// Export functions for use in other scripts
+window.UnitConverter = {
+  showSidebar,
+  hideSidebar,
+  setActiveNavItem
+};
