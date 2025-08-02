@@ -7,7 +7,7 @@ WORKDIR /usr/share/nginx/html
 # Remove default nginx static files
 RUN rm -rf ./*
 
-# Copy the Unit Converter directory contents to nginx html directory
+# Copy all files from UnitConverter directory to nginx html root
 COPY UnitConverter/ ./
 
 # Copy nginx configuration
